@@ -1,0 +1,202 @@
+#include <iostream>
+#include <string>
+#include <stdexcept>
+using namespace std;
+
+// базовий клас
+class SportGame {
+protected:
+    string name;
+    int players;
+
+public:
+    // конструктор
+    SportGame(string n = "Unknown", int p = 0) {
+        setName(n);
+        setPlayers(p);
+    }
+
+    // копіювання
+    SportGame(const SportGame& other) {
+        name = other.name;
+        players = other.players;
+    }
+
+    // оператор присвоєння
+    SportGame& operator=(const SportGame& other) {
+        if (this != &other) {
+            name = other.name;
+            players = other.players;
+        }
+        return *this;
+    }
+
+    // сеттери з перевіркою
+    void setName(string n) {
+        if (n.empty()) {
+            cout << "Error: name cannot be empty\n";
+            exit(1);
+        }
+        name = n;
+    }
+
+    void setPlayers(int p) {
+        if (p <= 0) {
+            cout << "Error: players must be > 0\n";
+            exit(1);
+        }
+        players = p;
+    }
+
+    // геттери
+    string getName() const { return name; }
+    int getPlayers() const { return players; }
+
+    // приведення до string
+    operator string() const {
+        return "Game: " + name + ", Players: " + to_string(players);
+    }
+
+    // вивід
+    friend ostream& operator<<(ostream& os, const SportGame& g) {
+        os << (string)g;
+        return os;
+    }
+
+    // ввід
+    friend istream& operator>>(istream& is, SportGame& g) {
+        string n;
+        int p;
+
+        cout << "Enter name: ";
+        is >> n;
+
+        cout << "Enter players: ";
+        is >> p;
+
+        g.setName(n);
+        g.setPlayers(p);
+
+        return is;
+    }
+};
+
+// похідний клас
+class Football : public SportGame {
+private:
+    int goals;
+
+public:
+    // конструктор
+    Football(string n = "Football", int p = 11, int g = 0)
+        : SportGame(n, p) {
+        setGoals(g);
+    }
+
+    // копіювання
+    Football(const Football& other)
+        : SportGame(other) {
+        goals = other.goals;
+    }
+
+    // оператор присвоєння
+    Football& operator=(const Football& other) {
+        if (this != &other) {
+            SportGame::operator=(other);
+            goals = other.goals;
+        }
+        return *this;
+    }
+
+    void setGoals(int g) {
+        if (g < 0) {
+            cout << "Error: goals cannot be negative\n";
+            exit(1);
+        }
+        goals = g;
+    }
+
+    int getGoals() const { return goals; }
+
+    // приведення до string
+    operator string() const {
+        return "Football: " + name +
+            ", Players: " + to_string(players) +
+            ", Goals: " + to_string(goals);
+    }
+
+    // вивід
+    friend ostream& operator<<(ostream& os, const Football& f) {
+        os << (string)f;
+        return os;
+    }
+
+    // ввід
+    friend istream& operator>>(istream& is, Football& f) {
+        string n;
+        int p, g;
+
+        cout << "Enter name: ";
+        is >> n;
+
+        cout << "Enter players: ";
+        is >> p;
+
+        cout << "Enter goals: ";
+        is >> g;
+
+        f.setName(n);
+        f.setPlayers(p);
+        f.setGoals(g);
+
+        return is;
+    }
+};
+
+// Функція для демонстрації
+SportGame processGame(SportGame g) {
+    cout << "Processing: " << g << endl;
+    return g;
+}
+
+int main() {
+    // Створення об’єктів
+    SportGame g1("Basketball", 5);
+    Football f1("Football", 11, 3);
+
+    cout << g1 << endl;
+    cout << f1 << endl;
+
+    // Ввід
+    SportGame g2;
+    cin >> g2;
+
+    Football f2;
+    cin >> f2;
+
+    cout << g2 << endl;
+    cout << f2 << endl;
+
+    // Копіювання
+    Football f3 = f1;
+    cout << "Copy: " << f3 << endl;
+
+    // Присвоєння
+    f3 = f2;
+    cout << "Assigned: " << f3 << endl;
+
+    // Масив об’єктів
+    Football arr[2] = {
+        Football("Game1", 11, 2),
+        Football("Game2", 11, 4)
+    };
+
+    for (int i = 0; i < 2; i++) {
+        cout << arr[i] << endl;
+    }
+
+    // Демонстрація підстановки
+    processGame(f1);
+
+    return 0;
+}
