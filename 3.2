@@ -1,173 +1,237 @@
+//SportGame.h
+#ifndef SPORTGAME_H
+#define SPORTGAME_H
+
 #include <iostream>
 #include <string>
-#include <stdexcept>
 using namespace std;
 
-// базовий клас
 class SportGame {
 protected:
-    string name;
-    int players;
+    string name;   // назва гри
+    int players;   // кількість гравців
 
 public:
-    // конструктор
-    SportGame(string n = "Unknown", int p = 0) {
-        setName(n);
-        setPlayers(p);
-    }
+    // Конструктор (з перевіркою через сеттери)
+    SportGame(string n = "Unknown", int p = 1);
 
-    // копіювання
-    SportGame(const SportGame& other) {
+    // Конструктор копіювання
+    SportGame(const SportGame& other);
+
+    // Оператор присвоєння
+    SportGame& operator=(const SportGame& other);
+
+    // Методи встановлення значень (з контролем коректності)
+    void setName(string n);
+    void setPlayers(int p);
+
+    // Методи отримання значень
+    string getName() const;
+    int getPlayers() const;
+
+    // Операція приведення до рядка
+    operator string() const;
+
+    // Операції вводу / виводу
+    friend ostream& operator<<(ostream& os, const SportGame& g);
+    friend istream& operator>>(istream& is, SportGame& g);
+};
+
+#endif
+//SportGame.cpp
+#include "SportGame.h"
+#include <cstdlib>
+
+// Конструктор (використовує сеттери для перевірки)
+SportGame::SportGame(string n, int p) {
+    setName(n);
+    setPlayers(p);
+}
+
+// Конструктор копіювання
+SportGame::SportGame(const SportGame& other) {
+    name = other.name;
+    players = other.players;
+}
+
+// Оператор присвоєння
+SportGame& SportGame::operator=(const SportGame& other) {
+    if (this != &other) {
         name = other.name;
         players = other.players;
     }
+    return *this;
+}
 
-    // оператор присвоєння
-    SportGame& operator=(const SportGame& other) {
-        if (this != &other) {
-            name = other.name;
-            players = other.players;
-        }
-        return *this;
+// Сеттер назви (з перевіркою)
+void SportGame::setName(string n) {
+    if (n.empty()) {
+        cout << "Error: name cannot be empty\n";
+        exit(1); // завершення програми при помилці
     }
+    name = n;
+}
 
-    // сеттери з перевіркою
-    void setName(string n) {
-        if (n.empty()) {
-            cout << "Error: name cannot be empty\n";
-            exit(1);
-        }
-        name = n;
+// Сеттер кількості гравців (з перевіркою)
+void SportGame::setPlayers(int p) {
+    if (p <= 0) {
+        cout << "Error: players must be > 0\n";
+        exit(1);
     }
+    players = p;
+}
 
-    void setPlayers(int p) {
-        if (p <= 0) {
-            cout << "Error: players must be > 0\n";
-            exit(1);
-        }
-        players = p;
-    }
+// Геттери
+string SportGame::getName() const { return name; }
+int SportGame::getPlayers() const { return players; }
 
-    // геттери
-    string getName() const { return name; }
-    int getPlayers() const { return players; }
+// Приведення об’єкта до рядка
+SportGame::operator string() const {
+    return "Game: " + name + ", Players: " + to_string(players);
+}
 
-    // приведення до string
-    operator string() const {
-        return "Game: " + name + ", Players: " + to_string(players);
-    }
+// Оператор виводу
+ostream& operator<<(ostream& os, const SportGame& g) {
+    os << (string)g;
+    return os;
+}
 
-    // вивід
-    friend ostream& operator<<(ostream& os, const SportGame& g) {
-        os << (string)g;
-        return os;
-    }
+// Оператор вводу
+istream& operator>>(istream& is, SportGame& g) {
+    string n;
+    int p;
 
-    // ввід
-    friend istream& operator>>(istream& is, SportGame& g) {
-        string n;
-        int p;
+    cout << "Enter name: ";
+    is >> n;
 
-        cout << "Enter name: ";
-        is >> n;
+    cout << "Enter players: ";
+    is >> p;
 
-        cout << "Enter players: ";
-        is >> p;
+    g.setName(n);     // перевірка через сеттер
+    g.setPlayers(p);  // перевірка через сеттер
 
-        g.setName(n);
-        g.setPlayers(p);
+    return is;
+}
+//Football.h
+#ifndef FOOTBALL_H
+#define FOOTBALL_H
 
-        return is;
-    }
-};
+#include "SportGame.h"
 
-// похідний клас
 class Football : public SportGame {
 private:
-    int goals;
+    int goals; // кількість голів
 
 public:
-    // конструктор
-    Football(string n = "Football", int p = 11, int g = 0)
-        : SportGame(n, p) {
-        setGoals(g);
-    }
+    // Конструктор
+    Football(string n = "Football", int p = 11, int g = 0);
 
-    // копіювання
-    Football(const Football& other)
-        : SportGame(other) {
-        goals = other.goals;
-    }
+    // Конструктор копіювання
+    Football(const Football& other);
 
-    // оператор присвоєння
-    Football& operator=(const Football& other) {
-        if (this != &other) {
-            SportGame::operator=(other);
-            goals = other.goals;
-        }
-        return *this;
-    }
+    // Оператор присвоєння
+    Football& operator=(const Football& other);
 
-    void setGoals(int g) {
-        if (g < 0) {
-            cout << "Error: goals cannot be negative\n";
-            exit(1);
-        }
-        goals = g;
-    }
+    // Сеттер / геттер
+    void setGoals(int g);
+    int getGoals() const;
 
-    int getGoals() const { return goals; }
+    // Приведення до рядка
+    operator string() const;
 
-    // приведення до string
-    operator string() const {
-        return "Football: " + name +
-            ", Players: " + to_string(players) +
-            ", Goals: " + to_string(goals);
-    }
-
-    // вивід
-    friend ostream& operator<<(ostream& os, const Football& f) {
-        os << (string)f;
-        return os;
-    }
-
-    // ввід
-    friend istream& operator>>(istream& is, Football& f) {
-        string n;
-        int p, g;
-
-        cout << "Enter name: ";
-        is >> n;
-
-        cout << "Enter players: ";
-        is >> p;
-
-        cout << "Enter goals: ";
-        is >> g;
-
-        f.setName(n);
-        f.setPlayers(p);
-        f.setGoals(g);
-
-        return is;
-    }
+    // Ввід / вивід
+    friend ostream& operator<<(ostream& os, const Football& f);
+    friend istream& operator>>(istream& is, Football& f);
 };
 
-// Функція для демонстрації
+#endif
+//Football.cpp
+#include "Football.h"
+#include <cstdlib>
+
+// Конструктор (виклик базового класу)
+Football::Football(string n, int p, int g)
+    : SportGame(n, p) {
+    setGoals(g);
+}
+
+// Конструктор копіювання
+Football::Football(const Football& other)
+    : SportGame(other) {
+    goals = other.goals;
+}
+
+// Оператор присвоєння
+Football& Football::operator=(const Football& other) {
+    if (this != &other) {
+        SportGame::operator=(other); // виклик базового класу
+        goals = other.goals;
+    }
+    return *this;
+}
+
+// Сеттер з перевіркою
+void Football::setGoals(int g) {
+    if (g < 0) {
+        cout << "Error: goals cannot be negative\n";
+        exit(1);
+    }
+    goals = g;
+}
+
+// Геттер
+int Football::getGoals() const { return goals; }
+
+// Приведення до рядка
+Football::operator string() const {
+    return "Football: " + name +
+        ", Players: " + to_string(players) +
+        ", Goals: " + to_string(goals);
+}
+
+// Вивід
+ostream& operator<<(ostream& os, const Football& f) {
+    os << (string)f;
+    return os;
+}
+
+// Ввід
+istream& operator>>(istream& is, Football& f) {
+    string n;
+    int p, g;
+
+    cout << "Enter name: ";
+    is >> n;
+
+    cout << "Enter players: ";
+    is >> p;
+
+    cout << "Enter goals: ";
+    is >> g;
+
+    f.setName(n);
+    f.setPlayers(p);
+    f.setGoals(g);
+
+    return is;
+}
+//main.cpp
+#include "Football.h"
+
 SportGame processGame(SportGame g) {
     cout << "Processing: " << g << endl;
     return g;
 }
 
 int main() {
-    // Створення об’єктів
+
     SportGame g1("Basketball", 5);
     Football f1("Football", 11, 3);
 
     cout << g1 << endl;
     cout << f1 << endl;
 
-    // Ввід
+    // Ввід об'єктів
     SportGame g2;
     cin >> g2;
 
@@ -177,15 +241,15 @@ int main() {
     cout << g2 << endl;
     cout << f2 << endl;
 
-    // Копіювання
+    // Конструктор копіювання
     Football f3 = f1;
     cout << "Copy: " << f3 << endl;
 
-    // Присвоєння
+    // Оператор присвоєння
     f3 = f2;
     cout << "Assigned: " << f3 << endl;
 
-    // Масив об’єктів
+    // Масив об'єктів
     Football arr[2] = {
         Football("Game1", 11, 2),
         Football("Game2", 11, 4)
@@ -195,8 +259,8 @@ int main() {
         cout << arr[i] << endl;
     }
 
-    // Демонстрація підстановки
-    processGame(f1);
+    // Демонстрація принципу підстановки
+    processGame(f1); // Football ? SportGame
 
     return 0;
 }
